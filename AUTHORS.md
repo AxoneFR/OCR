@@ -1,4 +1,4 @@
-gabriel.croci (Gabriel Croci)
-dorian.romagnoni (Dorian Romagnoni)
-matheo.lechalupe (Mathéo Lechalupe)
-anh-khoa.nguyen (Anh-Khoa Nguyen)
+gabriel.croci (Gabriel Croci)\n
+dorian.romagnoni (Dorian Romagnoni)\n
+matheo.lechalupe (Mathéo Lechalupe)\n
+anh-khoa.nguyen (Anh-Khoa Nguyen)\n
