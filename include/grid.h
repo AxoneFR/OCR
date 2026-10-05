@@ -3,7 +3,7 @@
 
 struct grid
 {
-    char **cells;
+    char **cells;//letter in the grid
     int w; //width of grid
     int h; //height of grid
 };

@@ -11,7 +11,7 @@ struct match
 };
 
 void word_upper(char *word);
-int solve_word(const struct grid *grid, const char *word,
+int solver(const struct grid *grid, const char *word,
     struct match *match);//This function repairs a first letter of a word and check every direction
 
 #endif
