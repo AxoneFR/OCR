@@ -1,12 +1,7 @@
 #ifndef OCR_BINARIZATION_H
 #define OCR_BINARIZATION_H
 
-unsigned char *load_grayscale(const char *path, int *width, int *height)
-{
-	int channels_in_file;
-	unsigned char *img = stbi_load(path, width, height, &channels_in_file, 1);
-	return img;
-}
+unsigned char *load_grayscale(const char *path, int *width, int *height);
 
 int otsu_threshold(const unsigned char *img, int width, int height);
 
