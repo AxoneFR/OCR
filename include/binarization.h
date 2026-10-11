@@ -10,7 +10,7 @@ unsigned char *load_grayscale(const char *path, int *width, int *height)
 
 int otsu_threshold(const unsigned char *img, int width, int height);
 
-void apply_threshold(unsigned char *img, int width, int height, int seuil);
+void apply_threshold(unsigned char *img, int width, int height, int threshold);
 
 
 
