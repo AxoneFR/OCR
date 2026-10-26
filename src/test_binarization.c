@@ -1,27 +1,29 @@
-#include "binarization.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "../include/binarization.h"
 
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	const char *img_path = "C:/Users/anhkh/Pictures/Saved Pictures/2 euros.png";
+    (void)argc;
+    (void)argv;
 
-	int width, height, channels_in_file;
-	unsigned char *img = stbi_load(img_path, &width, &height, &channels_in_file, 1);
+    const char *img_path = "C:/Users/anhkh/Pictures/Saved Pictures/2 euros.png";
 
-	assert(img != NULL && "Image non trouvee");
+    SDL_Surface *img = load_grayscale(img_path);
+    if (img == NULL)
+    {
+        return 1;
+    }
+    printf("Image chargee : %dx%d (niveaux de gris)\n", img->w, img->h);
+    IMG_SavePNG(img, "out_gray.png");
 
-	printf("Image chargee : %dx%d (niveaux de gris)\n", width, height);
+    int threshold = otsu_threshold(img);
+    printf("Seuil Otsu : %d\n", threshold);
 
-	stbi_write_png("out_gray.png", width, height, 1, img, width);
+    apply_threshold(img, threshold);
+    IMG_SavePNG(img, "out_binaire.png");
 
-	stbi_image_free(img);
-	return 0;
+    SDL_FreeSurface(img);
+    return 0;
 }
-
