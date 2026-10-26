@@ -1,13 +1,11 @@
-#ifndef OCR_BINARIZATION_H
-#define OCR_BINARIZATION_H
+#ifndef BINARIZATION_H
+#define BINARIZATION_H
+#include <SDL2/SDL.h>
 
-unsigned char *load_grayscale(const char *path, int *width, int *height);
-
-int otsu_threshold(const unsigned char *img, int width, int height);
-
-void apply_threshold(unsigned char *img, int width, int height, int threshold);
-
-
+SDL_Surface *load_image(const char *path);
+void to_grayscale(SDL_Surface *surface);
+int otsu_threshold(SDL_Surface *surface);
+void apply_threshold(SDL_Surface *surface, int seuil);
 
 #endif
 
