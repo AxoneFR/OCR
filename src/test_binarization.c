@@ -5,11 +5,17 @@
 
 int main(int argc, char *argv[])
 {
-    (void)argc;
-    (void)argv;
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: %s <image>\n", argv[0]);
+        return 1;
+    }
 
-    const char *img_path = "C:/Users/anhkh/Pictures/Saved Pictures/2 euros.png";
-
+    SDL_Surface *img = load_grayscale(argv[1]);
+    if (img == NULL)
+    {
+        return 1;
+    }
     SDL_Surface *img = load_grayscale(img_path);
     if (img == NULL)
     {
