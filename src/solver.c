@@ -1,6 +1,6 @@
 #include <ctype.h>
 #include <string.h>
-#include "solver.h"
+#include "../include/solver/solver.h"
 
 //The 8 directions as (dx, dy): right, left, down, up and the 4 diagonals
 static const int direct[8][2] =

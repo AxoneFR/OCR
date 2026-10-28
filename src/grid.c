@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "grid.h"
+#include "../include/solver/grid.h"
 
 void grid_free(struct grid *grid)
 {

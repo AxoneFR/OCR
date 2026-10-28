@@ -1,6 +1,8 @@
 #include <stdio.h>
-#include "grid.h"
-#include "solver.h"
+#include "../include/solver/grid.h"
+#include "../include/solver/solver.h"
+
+// MAIN DU SOLVER UNIQUEMENT
 
 int main(int argc, char **argv)
 {

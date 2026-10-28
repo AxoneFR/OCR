@@ -1,4 +1,4 @@
-#include "../include/binarization.h"
+#include "../include/image_proc/binarization.h"
 
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
