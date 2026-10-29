@@ -16,11 +16,7 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    SDL_Surface *img = load_grayscale(img_path);
-    if (img == NULL)
-    {
-        return 1;
-    }
+    
     printf("Image chargee : %dx%d (niveaux de gris)\n", img->w, img->h);
     IMG_SavePNG(img, "out_gray.png");
 
