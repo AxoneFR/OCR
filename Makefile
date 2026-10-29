@@ -8,7 +8,7 @@ TARGETS = solver test_binarization nn
 
 SRC_SOLVER = $(SRC_DIR)/main.c $(SRC_DIR)/grid.c $(SRC_DIR)/solver.c
 SRC_BINA   = $(SRC_DIR)/test_binarization.c $(SRC_DIR)/binarization.c
-SRC_NN     = $(SRC_DIR)/neural_network.c
+SRC_NN     = $(SRC_DIR)/neural_network.c $(SRC_DIR)/mlp_train.c
 
 OBJ_SOLVER = $(SRC_SOLVER:.c=.o)
 OBJ_BINA   = $(SRC_BINA:.c=.o)
