@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
     apply_threshold(img, threshold);
     IMG_SavePNG(img, "out_binaire.png");
 
+	remove_isolated(img); // Répare les degats
+    IMG_SavePNG(img, "out_cleaned.png");
+    printf("Suppression du bruit appliquee et sauvegardee : out_cleaned.png\n");
+
     SDL_FreeSurface(img);
     return 0;
 }
