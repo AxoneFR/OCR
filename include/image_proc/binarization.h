@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 SDL_Surface *load_image(const char *path);
-void load_grayscale(SDL_Surface *surface);
+SDL_Surface *load_grayscale(SDL_Surface *surface);
 int otsu_threshold(SDL_Surface *surface);
 void apply_threshold(SDL_Surface *surface, int seuil);
 

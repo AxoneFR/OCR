@@ -39,4 +39,6 @@ void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLE
 int save_network(Network *net, char *path);
 Network *load_network(char *path);
 
+int predict_xnor(Network *net, double input[NB_INPUTS]);
+
 #endif
