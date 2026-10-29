@@ -2,7 +2,7 @@
 #define BINARIZATION_H
 #include <SDL2/SDL.h>
 
-SDL_Surface *load_grayscale(SDL_Surface *surface);
+SDL_Surface *load_grayscale(const char *path);
 int otsu_threshold(SDL_Surface *surface);
 void apply_threshold(SDL_Surface *surface, int seuil);
 void remove_isolated(SDL_Surface *surface);
