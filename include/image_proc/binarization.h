@@ -2,10 +2,10 @@
 #define BINARIZATION_H
 #include <SDL2/SDL.h>
 
-SDL_Surface *load_image(const char *path);
 SDL_Surface *load_grayscale(SDL_Surface *surface);
 int otsu_threshold(SDL_Surface *surface);
 void apply_threshold(SDL_Surface *surface, int seuil);
+void remove_isolated(SDL_Surface *surface);
 
 #endif
 
@@ -14,5 +14,7 @@ void apply_threshold(SDL_Surface *surface, int seuil);
 //Principe de otsu_threshold : trouve le seuil via un histogramme ( calcul de la moyenne pour un unique seuil )
 
 //Principe de apply_threshold : par rapport à otsu , il prend ce seuil et l'intègre dans la fonction pour binariser l'image donc <= seuil renvoie noir sinon blanc
+
+//Principe de remove_isolated : elimine les pixels noires isolés donc les pixels noires simple qui ont 8 voisins blanc ( bizarre mais tkt ).
 
 //Irfan view pour tester le tout (outil pour tester notre résultat)
