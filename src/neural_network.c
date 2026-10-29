@@ -5,71 +5,139 @@ double sigmoid(double x){
     return 1.0 / (1.0 + exp(-x));
 }
 
-// derivate of sigmoid
 double sigmoid_prime(double y){
     return y * (1.0 - y);
 }
 
-double init_weight(){
-    return ((double)rand() / (double)RAND_MAX) * 2.0 - 1.0;
+double random_weight(){
+    return ((double)rand() / (double)RAND_MAX) - 0.5; //  * 2.0 - 1.0
 }
 
-// 2-2-1
 void init_network(Network *net){
 
-    for (int i = 0; i < 2; i++) {
-        net->b_hidden[i] = init_weight();
-        for (int j = 0; j < 2; j++) {
-            net->w_hidden[i][j] = init_weight();
+    for (int i = 0; i < NB_HIDDEN; i++) {
+        net->b_hidden[i] = random_weight();
+        for (int j = 0; j < NB_INPUTS; j++) {
+            net->w_hidden[i][j] = random_weight();
         }
     }
 
-    for (int i = 0; i < 2; i++) {
-        net->w_output[i] = init_weight();
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+        for (int j = 0; j < NB_HIDDEN; j++)
+        {
+            net->w_output[i][j] = random_weight();
+        }
     }
-    net->b_output = init_weight();
+
+    for (int i = 0; i < NB_OUTPUTS; i++){
+        net->b_output[i] = random_weight();
+    }
 }
 
-void forward(Network *net, double input[2]) {
+void forward(Network *net, double input[NB_INPUTS]) {
     
     //hidden part
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < NB_HIDDEN; i++) {
         double sum = net->b_hidden[i];
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < NB_INPUTS; j++) {
             sum += input[j] * net->w_hidden[i][j];
         }
         net->hidden[i] = sigmoid(sum);
     }
 
     //output part
-    double sum_out = net->b_output;
-    for (int i = 0; i < 2; i++) {
-        sum_out += net->hidden[i] * net->w_output[i];
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+
+        double sum_out = net->b_output[i];
+        for (int j = 0; j < NB_HIDDEN; j++){
+
+            sum_out += net->hidden[j] * net->w_output[i][j];
+        }
+
+        net->output[i] = sigmoid(sum_out);
     }
-    net->output = sigmoid(sum_out);
 }
 
-void train(Network *net, double input[2], double target, double lr){
+void train(Network *net, double input[NB_INPUTS], double target[NB_OUTPUTS], double lr){
     forward(net, input);
 
-    double d_output = (net->output - target) * sigmoid_prime(net->output);
-
-    double d_hidden[2];
-    for (int i = 0; i < 2; i++) {
-        d_hidden[i] = (d_output * net->w_output[i]) * sigmoid_prime(net->hidden[i]);
+    // backpropagation : we measure the errors from the output to the input
+    double d_output[NB_OUTPUTS];
+    for (int i = 0; i < NB_OUTPUTS; i++){
+        d_output[i] = (net->output[i] - target[i]) * sigmoid_prime(net->output[i]);
     }
 
-    for (int i = 0; i < 2; i++) {
-        net->w_output[i] -= lr * d_output * net->hidden[i];
-    }
-    net->b_output -= lr * d_output;
+    double d_hidden[NB_HIDDEN];
+    for (int i = 0; i < NB_HIDDEN; i++) {
 
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
+        double error = 0.0;
+        for (int j = 0; j < NB_OUTPUTS; j++){
+            error += (d_output[j] * net->w_output[j][i]);
+        }
+        d_hidden[i] = error * sigmoid_prime(net->hidden[i]);
+    }
+
+    // descente de gradient : update of the weights and biases
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+
+        for (int j = 0; j < NB_HIDDEN; j++){
+            net->w_output[i][j] -= lr * d_output[i] * net->hidden[j];
+        }
+        net->b_output[i] -= lr * d_output[i];   
+    }
+
+    for (int i = 0; i < NB_HIDDEN; i++) {
+        for (int j = 0; j < NB_INPUTS; j++) {
             net->w_hidden[i][j] -= lr * d_hidden[i] * input[j];
         }
         net->b_hidden[i] -= lr * d_hidden[i];
     }
+}
+
+void show_results(Network *net, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]) {
+    printf("--- Résultats après entraînement ---\n");
+    for (int i = 0; i < NB_SAMPLES; i++) {
+        forward(net, inputs[i]);
+        printf("Entrée %d : ", i);
+        for (int k = 0; k < NB_OUTPUTS; k++) {
+            printf("Sortie attendue : %.0f | Prédiction : %.4f (Arrondi : %d) ",
+                   targets[i][k], net->output[k], net->output[k] > 0.5 ? 1 : 0);
+        }
+        printf("\n");
+    }
+
+    printf("--- Affichage des poids & biais ---\n");
+
+    for (int i = 0; i < NB_HIDDEN; i++) {
+        for (int j = 0; j < NB_INPUTS; j++) {
+            printf("poids du noeud [%d,%d] caché : %f\n", i, j, net->w_hidden[i][j]);
+        }
+    }
+    for (int j = 0; j < NB_HIDDEN; j++) {
+        printf("biais du noeud %d caché : %f\n", j, net->b_hidden[j]);
+    }
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+        for (int j = 0; j < NB_HIDDEN; j++) {
+            printf("poids de sortie [%d,%d] : %f\n", i, j, net->w_output[i][j]);
+        }
+        printf("biais du noeud %d de sortie : %f\n", i, net->b_output[i]);
+    }
+}
+
+void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]){
+
+    for (int step = 0; step < epochs; step++) {
+        int idx = rand() % 4;
+        train(net, inputs[idx], targets[idx], lr);
+    }
+}
+
+void save_network(Network *net){
+    (void)net;
+}
+
+void load_network(FILE *file){
+    (void)file;
 }
 
 int main(){
@@ -80,23 +148,19 @@ int main(){
     init_network(&net);
 
     double inputs[4][2] = { {0,0}, {0,1}, {1,0}, {1,1}};
-    double targets[4] = {1, 0, 0, 1};
 
-    double lr = 0.2;
-    int epochs = 1000000000;
+    double targets[NB_SAMPLES][NB_OUTPUTS] = {
+        {1.0},
+        {0.0},
+        {0.0},
+        {1.0}
+    };
 
-    for (int epoch = 0; epoch < epochs; epoch++) {
-        for (int i = 0; i < 4; i++) {
-            train(&net, inputs[i], targets[i], lr);
-        }
-    }
+    double lr = 0.5;
+    int epochs = 50000;
 
-    printf("--- Résultats après entraînement ---\n");
-    for (int i = 0; i < 4; i++) {
-        forward(&net, inputs[i]);
-        printf("Entrée : [%.0f, %.0f] -> Sortie attendue : %.0f | Prédiction : %.4f (Arrondi : %d)\n",
-               inputs[i][0], inputs[i][1], targets[i], net.output, net.output > 0.5 ? 1 : 0);
-    }
+    complete_train(&net, epochs, lr, inputs, targets);
+    show_results(&net, inputs, targets);
 
     return EXIT_SUCCESS;
 }
