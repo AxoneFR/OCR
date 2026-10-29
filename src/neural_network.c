@@ -1,4 +1,5 @@
 #include "../include/neural_network/neural_network.h"
+#include "../include/neural_network/emnlist_loader.h"
 
 // take x and put it in the interval ]0,1[
 double sigmoid(double x){
@@ -94,22 +95,26 @@ void train(Network *net, double input[NB_INPUTS], double target[NB_OUTPUTS], dou
     }
 }
 
-void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]){
+// need to update the training for the letters
+void complete_train(Network *net, int epochs, double lr, double **inputs, double **targets) {
 
     for (int step = 0; step < epochs; step++) {
-        int idx = rand() % 4;
+        int idx = rand() % 4; //fix
         train(net, inputs[idx], targets[idx], lr);
+
+        printf("Epoch %d / %d\n", step + 1, epochs);
     }
 }
 
-void test_results(Network *net, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]) {
+void test_results(Network *net, int nb_samples, double **inputs, double **targets) {
     printf("--- Results ---\n");
-    for (int i = 0; i < NB_SAMPLES; i++) {
+    for (int i = 0; i < nb_samples; i++) {
         forward(net, inputs[i]);
-        printf("Input [%0.f, %0.f] : ", inputs[i][0], inputs[i][1]);
+        
+        printf("Sample %d -> ", i);
         for (int k = 0; k < NB_OUTPUTS; k++) {
-            printf("Expected output : %.0f | Prediction : %.4f (Final result : %d) ",
-                   targets[i][k], net->output[k], net->output[k] > 0.5 ? 1 : 0);
+            printf("Expected: %.0f | Pred: %.4f (Bit: %d) ",
+                   targets[i][k], net->output[k], net->output[k] >= 0.5 ? 1 : 0);
         }
         printf("\n");
     }
@@ -174,36 +179,84 @@ int predict_xnor(Network *net, double input[NB_INPUTS]) {
     return result;
 }
 
+char predict_char(Network *net, double *input){
+
+    forward(net, input);
+
+    int best_index = 0;
+    double max_output = net->output[0];
+
+    for (int i = 1; i < NB_OUTPUTS; i++) {
+        if (net->output[i] > max_output) {
+            max_output = net->output[i];
+            best_index = i;
+        }
+    }
+
+    return (char)('A' + best_index);
+}
+
+char get_expected_char(Dataset *dataset, int sample_index) {
+    if (!dataset || sample_index < 0 || sample_index >= dataset->count) {
+        return '?';
+    }
+
+    for (int k = 0; k < NB_OUTPUTS; k++) {
+        if (dataset->targets[sample_index][k] > 0.5) {
+            return (char)('A' + k);
+        }
+    }
+
+    return '?';
+}
+
 int main(){
 
     srand(time(NULL));
 
-    Network net;
-    init_network(&net);
+    Network *net = malloc(sizeof(Network));
+    init_network(net);
 
-    double inputs[4][2] = { {0,0}, {0,1}, {1,0}, {1,1}};
-
-    double targets[NB_SAMPLES][NB_OUTPUTS] = {
-        {1.0},
-        {0.0},
-        {0.0},
-        {1.0}
-    };
+    double xnor_raw[4][2] = { {0.0, 0.0}, {0.0, 1.0}, {1.0, 0.0}, {1.0, 1.0} };
+    double targets_raw[4][1] = { {1.0}, {0.0}, {0.0}, {1.0} };
+    double *xnor_inputs[4] = { xnor_raw[0], xnor_raw[1], xnor_raw[2], xnor_raw[3] };
+    double *xnor_targets[4] = { targets_raw[0], targets_raw[1], targets_raw[2], targets_raw[3] };
 
     double lr = 0.5;
     int epochs = 50000;
 
-    complete_train(&net, epochs, lr, inputs, targets);
-    //test_results(&net, inputs, targets);
-
-    save_network(&net, "include/saved_networks/net1");
+    complete_train(net, epochs, lr, xnor_inputs, xnor_targets);
+    save_network(net, "include/saved_networks/net1");
 
     Network *savedNet = load_network("include/saved_networks/net1");
     if (savedNet){
-        test_results(savedNet, inputs, targets);
+        test_results(savedNet, 4, xnor_inputs, xnor_targets);
         double sample[2] = {0, 0};
         predict_xnor(savedNet, sample);
     }
+
+
+    // for letters
+    // training does not work as expected for now, fix train_complete
+
+    // Dataset *dataset = load_emnist_dataset(
+    //     "tests/emnist-letters-train-images-idx3-ubyte",
+    //     "tests/emnist-letters-train-labels-idx1-ubyte",
+    //     100000
+    // );
+
+    // complete_train(net, 30, 0.05, dataset->inputs, dataset->targets);
+    // save_network(net, "include/saved_networks/net_letters");
+    // Network *saved = load_network("include/saved_networks/net_letters");
+
+    // for(int i = 0; i < 42; i++){
+    //     char e = get_expected_char(dataset, i);
+    //     char p = predict_char(saved, dataset->inputs[i]);
+    //     printf("Expected letter : %c | Predicted letter : %c\n", e, p);
+    // }
+    
+    // free_dataset(dataset);
+    // free(net);
 
     return EXIT_SUCCESS;
 }
