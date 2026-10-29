@@ -94,36 +94,6 @@ void train(Network *net, double input[NB_INPUTS], double target[NB_OUTPUTS], dou
     }
 }
 
-void show_results(Network *net, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]) {
-    printf("--- Résultats après entraînement ---\n");
-    for (int i = 0; i < NB_SAMPLES; i++) {
-        forward(net, inputs[i]);
-        printf("Entrée %d : ", i);
-        for (int k = 0; k < NB_OUTPUTS; k++) {
-            printf("Sortie attendue : %.0f | Prédiction : %.4f (Arrondi : %d) ",
-                   targets[i][k], net->output[k], net->output[k] > 0.5 ? 1 : 0);
-        }
-        printf("\n");
-    }
-
-    printf("--- Affichage des poids & biais ---\n");
-
-    for (int i = 0; i < NB_HIDDEN; i++) {
-        for (int j = 0; j < NB_INPUTS; j++) {
-            printf("poids du noeud [%d,%d] caché : %f\n", i, j, net->w_hidden[i][j]);
-        }
-    }
-    for (int j = 0; j < NB_HIDDEN; j++) {
-        printf("biais du noeud %d caché : %f\n", j, net->b_hidden[j]);
-    }
-    for (int i = 0; i < NB_OUTPUTS; i++) {
-        for (int j = 0; j < NB_HIDDEN; j++) {
-            printf("poids de sortie [%d,%d] : %f\n", i, j, net->w_output[i][j]);
-        }
-        printf("biais du noeud %d de sortie : %f\n", i, net->b_output[i]);
-    }
-}
-
 void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]){
 
     for (int step = 0; step < epochs; step++) {
@@ -132,12 +102,76 @@ void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLE
     }
 }
 
-void save_network(Network *net){
-    (void)net;
+void test_results(Network *net, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]) {
+    printf("--- Results ---\n");
+    for (int i = 0; i < NB_SAMPLES; i++) {
+        forward(net, inputs[i]);
+        printf("Input [%0.f, %0.f] : ", inputs[i][0], inputs[i][1]);
+        for (int k = 0; k < NB_OUTPUTS; k++) {
+            printf("Expected output : %.0f | Prediction : %.4f (Final result : %d) ",
+                   targets[i][k], net->output[k], net->output[k] > 0.5 ? 1 : 0);
+        }
+        printf("\n");
+    }
 }
 
-void load_network(FILE *file){
-    (void)file;
+void show_wb(Network *net){
+    printf("--- Weight & biases ---\n");
+
+    for (int i = 0; i < NB_HIDDEN; i++) {
+        for (int j = 0; j < NB_INPUTS; j++) {
+            printf("Hidden weight of node  [%d, %d] : %f\n", i, j, net->w_hidden[i][j]);
+        }
+    }
+    for (int j = 0; j < NB_HIDDEN; j++) {
+        printf("Hidden bias of node  [%d] : %f\n", j, net->b_hidden[j]);
+    }
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+        for (int j = 0; j < NB_HIDDEN; j++) {
+            printf("Output weight of node [%d, %d] : %f\n", i, j, net->w_output[i][j]);
+        }
+        printf("Output bias of node [%d] : %f\n", i, net->b_output[i]);
+    }
+}
+
+int save_network(Network *net, char *path){
+    FILE *file = fopen(path, "w");
+    if (file == NULL) return 0;
+
+    fwrite(net->w_hidden, sizeof(double), NB_HIDDEN * NB_INPUTS, file);
+    fwrite(net->b_hidden, sizeof(double), NB_HIDDEN, file);
+
+    fwrite(net->w_output, sizeof(double), NB_OUTPUTS * NB_HIDDEN, file);
+    fwrite(net->b_output, sizeof(double), NB_OUTPUTS, file);
+
+    fclose(file);
+
+    printf("Saved in %s\n", path);
+    return 1;
+}
+
+Network *load_network(char *path){
+    FILE *file = fopen(path, "rb");
+    if (!file) return NULL;
+
+    Network *net = malloc(sizeof(Network));
+    
+    fread(net->w_hidden, sizeof(double), NB_HIDDEN * NB_INPUTS, file);
+    fread(net->b_hidden, sizeof(double), NB_HIDDEN, file);
+    
+    fread(net->w_output, sizeof(double), NB_OUTPUTS * NB_HIDDEN, file);
+    fread(net->b_output, sizeof(double), NB_OUTPUTS, file);
+
+    fclose(file);
+
+    return net;
+}
+
+int predict_xnor(Network *net, double input[NB_INPUTS]) {
+    forward(net, input);
+    int result = net->output[0] >= 0.5 ? 1 : 0; 
+    printf("XNOR(%0.f, %0.f) = %d\n", input[0], input[1], result);
+    return result;
 }
 
 int main(){
@@ -160,7 +194,16 @@ int main(){
     int epochs = 50000;
 
     complete_train(&net, epochs, lr, inputs, targets);
-    show_results(&net, inputs, targets);
+    //test_results(&net, inputs, targets);
+
+    save_network(&net, "include/saved_networks/net1");
+
+    Network *savedNet = load_network("include/saved_networks/net1");
+    if (savedNet){
+        test_results(savedNet, inputs, targets);
+        double sample[2] = {0, 0};
+        predict_xnor(savedNet, sample);
+    }
 
     return EXIT_SUCCESS;
 }

@@ -34,5 +34,9 @@ void init_network(Network *net);
 void forward(Network *net, double input[NB_INPUTS]);
 
 void train(Network *net, double input[NB_INPUTS], double target[NB_OUTPUTS], double lr);
+void complete_train(Network *net, int epochs, double lr, double inputs[NB_SAMPLES][NB_INPUTS], double targets[NB_SAMPLES][NB_OUTPUTS]);
+
+int save_network(Network *net, char *path);
+Network *load_network(char *path);
 
 #endif
