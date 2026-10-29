@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g -Iinclude -Iinclude/solver -Iinclude/image_proc -Iinclude/neural_network -Iinclude/segmentation
-LDFLAGS = -lm
+LDFLAGS = -lm -lSDL2 -lSDL2_image
 
 SRC_DIR = src
 
