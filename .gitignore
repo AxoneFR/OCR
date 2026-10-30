@@ -58,3 +58,7 @@ dkms.conf
 *.png
 *.pnj
 *.bmp
+
+# personal cli do not push
+include/neural_network/test_cli.h
+src/nn_cli.c

@@ -235,7 +235,6 @@ int main(){
         predict_xnor(savedNet, sample);
     }
 
-
     // for letters
     // training does not work as expected for now, fix train_complete
 
@@ -256,7 +255,7 @@ int main(){
     // }
     
     // free_dataset(dataset);
-    // free(net);
+    free(net);
 
     return EXIT_SUCCESS;
 }

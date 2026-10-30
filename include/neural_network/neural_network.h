@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+
+#define SAVED_N_DIR "include/saved_networks/"
 
 #define NB_SAMPLES  4 // ???
 
@@ -42,6 +47,9 @@ void complete_train(Network *net, int epochs, double lr, double **inputs, double
 
 int save_network(Network *net, char *path);
 Network *load_network(char *path);
+
+void test_results(Network *net, int nb_samples, double **inputs, double **targets);
+void show_wb(Network *net);
 
 int predict_xnor(Network *net, double input[NB_INPUTS]);
 char predict_char(Network *net, double *input);
