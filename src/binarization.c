@@ -117,3 +117,53 @@ void apply_threshold(SDL_Surface *surface, int threshold)
         }
     }
 }
+
+
+void remove_isolated(SDL_Surface *surface)
+{
+    if (surface == NULL)
+    {
+        return;
+    }
+
+    int width = surface->w;
+    int height = surface->h;
+
+    // We avoid touching the border so we keep it at y = 1
+    for (int y = 1; y < height - 1; y++)
+    {
+        for (int x = 1; x < width - 1; x++)
+        {
+            Uint8 *p = get_pixel(surface, x, y);
+
+            // If black pixel
+            if (p[0] == 0)
+            {
+                int white_neighbors = 0;
+
+                // Check nearby neighbours if they are 8
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        if (dx == 0 && dy == 0){continue;}
+
+                        Uint8 *neighbor = get_pixel(surface, x + dx, y + dy);
+                        if (neighbor[0] == 255)
+                        {
+                            white_neighbors++;
+                        }
+                    }
+                }
+
+
+                if (white_neighbors == 8)
+                {
+                    p[0] = 255;
+                    p[1] = 255;
+                    p[2] = 255;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+# w_hidden
+//values
+
+# b_hidden
+// values
+
+# w_output
+// values
+
+# b_output
+// values

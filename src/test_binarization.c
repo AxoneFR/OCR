@@ -16,11 +16,7 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    SDL_Surface *img = load_grayscale(img_path);
-    if (img == NULL)
-    {
-        return 1;
-    }
+    
     printf("Image chargee : %dx%d (niveaux de gris)\n", img->w, img->h);
     IMG_SavePNG(img, "out_gray.png");
 
@@ -29,6 +25,10 @@ int main(int argc, char *argv[])
 
     apply_threshold(img, threshold);
     IMG_SavePNG(img, "out_binaire.png");
+
+	remove_isolated(img); // Répare les degats
+    IMG_SavePNG(img, "out_cleaned.png");
+    printf("Suppression du bruit appliquee et sauvegardee : out_cleaned.png\n");
 
     SDL_FreeSurface(img);
     return 0;
