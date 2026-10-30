@@ -1,45 +1,59 @@
-# PROJET OCR
-## Equipe PA2_G1 - Promotion 2030
+# Projet OCR - Résolution de Mots Croisés
 
-1. COMPILATION
---------------
-Pour compiler l'ensemble des modules du projet, executez a la racine :
+**Équipe :** PA2_G1 — **Promotion :** 2030
 
-    make
+---
+
+## 1. Compilation
+
+Pour compiler l'ensemble des modules du projet, exécutez à la racine :
+
+```bash
+make
+```
 
 Pour nettoyer les fichiers objets et binaires :
 
-    make clean
+```bash
+make clean
+```
 
+---
 
-2. UTILISATION DES MODULES
---------------------------
+## 2. Utilisation des Modules
 
-A. Solveur de grille (Solver)
-   Recherche un mot dans une grille fournie sous forme de fichier texte.
-   
-   Syntaxe :
-       ./solver <fichier_grille> <mot>
+### A. Solveur de grille (Solver)
+Recherche un mot dans une grille fournie sous forme de fichier texte.
 
-   Exemple :
-       ./solver tests/grid.txt HELLO
+* **Syntaxe :**
+  ```bash
+  ./solver <fichier_grille> <mot>
+  ```
+* **Exemple :**
+  ```bash
+  ./solver tests/grid.txt HELLO
+  ```
 
+---
 
-B. Reseau de neurones (OCR / MLP)
-   Lance l'entrainement et le test du reseau sur la porte non-lineaire XNOR,
-   puis sauvegarde et charge le modele entraine.
+### B. Réseau de neurones (OCR / MLP)
+Lance l'entraînement et le test du réseau sur la porte non-linéaire XNOR, puis sauvegarde et charge le modèle entraîné.
 
-   Syntaxe :
-       ./nn
+* **Syntaxe :**
+  ```bash
+  ./nn
+  ```
 
+---
 
-C. Traitement d'image (Image Processing)
-   Execute le pretraitement visuel complet sur une image (niveaux de gris,
-   binarisation par Otsu et suppression des bruits parasites).
+### C. Traitement d'image (Image Processing)
+Exécute le prétraitement visuel complet sur une image (niveaux de gris, binarisation par Otsu et suppression des bruits parasites).
 
-   Syntaxe :
-       ./test_binarization <chemin_image>
-
-   Exemple :
-       ./test_binarization tests/image.png
-================================================================================
+* **Syntaxe :**
+  ```bash
+  ./test_binarization <chemin_image>
+  ```
+* **Exemple :**
+  ```bash
+  ./test_binarization tests/image.png
+  ```
