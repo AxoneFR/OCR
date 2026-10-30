@@ -102,8 +102,9 @@ void complete_train(Network *net, int epochs, double lr, double **inputs, double
         int idx = rand() % 4; //fix
         train(net, inputs[idx], targets[idx], lr);
 
-        printf("Epoch %d / %d\n", step + 1, epochs);
+        // printf("Epoch %d / %d\n", step + 1, epochs);
     }
+    // printf("\n\n");
 }
 
 void test_results(Network *net, int nb_samples, double **inputs, double **targets) {
@@ -111,13 +112,19 @@ void test_results(Network *net, int nb_samples, double **inputs, double **target
     for (int i = 0; i < nb_samples; i++) {
         forward(net, inputs[i]);
         
-        printf("Sample %d -> ", i);
+        printf("Sample %d -> Inputs: [", i);
+        for (int j = 0; j < NB_INPUTS; j++) {
+            printf("%.0f%s", inputs[i][j], (j < NB_INPUTS - 1) ? ", " : "");
+        }
+        printf("] | ");
+
         for (int k = 0; k < NB_OUTPUTS; k++) {
             printf("Expected: %.0f | Pred: %.4f (Bit: %d) ",
                    targets[i][k], net->output[k], net->output[k] >= 0.5 ? 1 : 0);
         }
         printf("\n");
     }
+    printf("\n\n");
 }
 
 void show_wb(Network *net){
@@ -137,6 +144,7 @@ void show_wb(Network *net){
         }
         printf("Output bias of node [%d] : %f\n", i, net->b_output[i]);
     }
+    printf("\n\n");
 }
 
 int save_network(Network *net, char *path){
@@ -226,13 +234,23 @@ int main(){
     int epochs = 50000;
 
     complete_train(net, epochs, lr, xnor_inputs, xnor_targets);
+    show_wb(net);
     save_network(net, "include/saved_networks/net1");
 
+    printf("Loaded model :\n");
     Network *savedNet = load_network("include/saved_networks/net1");
     if (savedNet){
         test_results(savedNet, 4, xnor_inputs, xnor_targets);
-        double sample[2] = {0, 0};
-        predict_xnor(savedNet, sample);
+
+        for (size_t i = 0; i < 2; i++)
+        {
+            for (size_t j = 0; j < 2; j++)
+            {
+                double sample[2] = {i, j};
+                predict_xnor(savedNet, sample);
+            }
+        }
+        
     }
 
     // for letters
